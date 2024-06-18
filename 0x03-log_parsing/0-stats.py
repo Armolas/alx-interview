@@ -16,12 +16,14 @@ status_counts = {
 }
 
 def print_stats():
+    '''prints stats'''
     print(f"File size: {total_size}")
     for status in sorted(status_counts.keys()):
         if status_counts[status] > 0:
             print(f"{status}: {status_counts[status]}")
 
 def signal_handler(sig, frame):
+    '''handles signals'''
     print_stats()
     sys.exit(0)
 
