@@ -2,7 +2,9 @@
 '''log parsing'''
 import sys
 import signal
+import re
 
+# Initialize metrics
 total_size = 0
 status_counts = {
     "200": 0,
@@ -15,9 +17,14 @@ status_counts = {
     "500": 0
 }
 
+# Regular expression to match the log line format
+log_pattern = re.compile(
+    r'^\d{1,3}(\.\d{1,3}){3} - \[\S+ \S+\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
+)
+
 
 def print_stats():
-    '''prints stats'''
+    """Print the current statistics."""
     print(f"File size: {total_size}")
     for status in sorted(status_counts.keys()):
         if status_counts[status] > 0:
@@ -25,31 +32,29 @@ def print_stats():
 
 
 def signal_handler(sig, frame):
-    '''handles signals'''
+    """Handle keyboard interruption."""
     print_stats()
     sys.exit(0)
 
 
+# Set up signal handler for keyboard interruption
 signal.signal(signal.SIGINT, signal_handler)
 
 line_count = 0
 
 try:
     for line in sys.stdin:
-        parts = line.split()
-        if len(parts) < 9:
+        match = log_pattern.match(line.strip())
+        if not match:
             continue
 
-        ip = parts[0]
-        status_code = parts[8]
-        file_size = parts[9]
+        status_code = match.group(2)
+        file_size = int(match.group(3))
 
-        try:
-            file_size = int(file_size)
-            total_size += file_size
-        except ValueError:
-            continue
+        # Update total file size
+        total_size += file_size
 
+        # Update status code count
         if status_code in status_counts:
             status_counts[status_code] += 1
 
@@ -62,3 +67,6 @@ try:
 except KeyboardInterrupt:
     print_stats()
     sys.exit(0)
+
+# Print final stats if the loop ends
+print_stats()
