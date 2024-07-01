@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 '''utf-8 validation interview task'''
 
 
@@ -20,7 +20,7 @@ def validUTF8(data):
             while mask & num:
                 n_bytes += 1
                 mask >>= 1
-            
+
             # 1-byte characters (0xxxxxxx) or invalid if n_bytes is 1 or > 4
             if n_bytes == 0:
                 continue
@@ -30,9 +30,9 @@ def validUTF8(data):
             # Check that the next bytes start with 10xxxxxx
             if not (num & mask1 and not (num & mask2)):
                 return False
-        
+
         # Decrement the number of bytes remaining in the current character
         n_bytes -= 1
-    
+
     # If n_bytes is not zero, then we have an incomplete character at the end
     return n_bytes == 0
