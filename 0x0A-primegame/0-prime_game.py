@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+""" Prime game"""
 
 
 def sieve(max_n):
